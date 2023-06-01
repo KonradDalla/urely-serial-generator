@@ -30,6 +30,7 @@ URELY_APIKEY="Your API key here"
 URELY_BRANDID="Your brand ID here"
 URELY_TAGTYPEID="Your tag type ID here"
 URELY_URL="https://labid.test.mia-platform.eu"
+```
 
 ## Usage
 
