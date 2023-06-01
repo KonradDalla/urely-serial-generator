@@ -70,7 +70,7 @@ async function login () {
 }
 
 async function loadTags (batches, accessToken) {
-  for (let i = 0; i <= batches.length; i++) {
+  for (let i = 0; i < batches.length; i++) {
     try {
       const tags = batches[i]
       await axios.post(
@@ -95,7 +95,7 @@ async function loadTags (batches, accessToken) {
         }
       )
       progressBar.increment()
-      progressBar.update(i)
+      progressBar.update(i + 1)
     } catch (error) {
       console.error(error)
       progressBar.stop()
