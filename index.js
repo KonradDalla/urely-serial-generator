@@ -77,4 +77,4 @@ async function generateAndLoad({serial = process.env.SERIAL, serialLength = proc
     const { accessToken } = await login()
     await loadTags(batches,accessToken)
 }
-await generateAndLoad({serial:3,batchName:'test3'})
+await generateAndLoad({})
