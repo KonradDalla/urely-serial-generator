@@ -30,3 +30,64 @@ URELY_APIKEY="Your API key here"
 URELY_BRANDID="Your brand ID here"
 URELY_TAGTYPEID="Your tag type ID here"
 URELY_URL="https://labid.test.mia-platform.eu"
+
+## Usage
+
+To use the module, follow the steps below:
+
+1. Install the dependencies by running the following command:
+
+   ```shell
+   npm install
+   ```
+
+2. Set up the environment variables. Create a `.env` file in the root directory of your project and provide the necessary values. Here's an example `.env` file:
+
+   ```
+   SERIAL=ABC123
+   SERIAL_LENGTH=8
+   BATCH_LENGTH=50
+   BATCH_NAME=My Batch
+   ```
+
+   Make sure to replace the values with your desired configuration.
+
+3. Import the `generateAndLoad` function from the module in your index file:
+
+   ```javascript
+   import { generateAndLoad } from './urely-serial-generator.js'
+   ```
+
+4. Call the `generateAndLoad` function, passing the desired arguments. The function will prioritize the provided arguments, fallback to environment variables if available, and finally use default values:
+
+   ```javascript
+   // Example 1: Providing all arguments from the index file
+   generateAndLoad({
+     serial: 'ABC123',
+     serialLength: 8,
+     batchLength: 50,
+     batchName: 'My Batch'
+   });
+
+   // Example 2: Using environment variables
+   generateAndLoad();
+
+   // Example 3: Using a mix of arguments and environment variables
+   generateAndLoad({
+     serial: 'XYZ789',
+     serialLength: process.env.SERIAL_LENGTH,
+     batchLength: 100,
+   });
+   ```
+
+   In Example 1, all arguments are provided directly from the index file. In Example 2, no arguments are passed, so the function falls back to using the environment variables. In Example 3, some arguments are provided, while others are left undefined, so the function uses the provided values where available and falls back to environment variables or defaults for the missing ones.
+
+5. Run your application by executing the index file using Node.js:
+
+   ```shell
+   node index.js
+   ```
+
+   The `generateAndLoad` function will execute with the specified configuration.
+
+That's it! You can now use the module with the desired arguments, environment variables, or defaults. Feel free to customize the arguments and environment variables according to your needs.
