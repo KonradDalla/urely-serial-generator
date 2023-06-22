@@ -104,9 +104,9 @@ To use the module, follow the steps below:
    ```
    The available options are:
 
-   --serial or -s: Set how many serial numbers will be generated (default: SERIAL from .env).
-   --serialLength or -l: Set the serial number length (default: SERIAL_LENGTH from .env).
-   --batchLength or -b: Set the batch length to laod (default: BATCH_LENGTH from .env).
-   --batchName or -n: Set the batch name (default: BATCH_NAME from .env).
+   * serial or -s: Set how many serial numbers will be generated (default: SERIAL from .env).
+   * serialLength or -l: Set the serial number length (default: SERIAL_LENGTH from .env).
+   * batchLength or -b: Set the batch length to laod (default: BATCH_LENGTH from .env).
+   * batchName or -n: Set the batch name (default: BATCH_NAME from .env).
 
 That's it! You can now use the module with the desired arguments, environment variables, or defaults. Feel free to customize the arguments and environment variables according to your needs.
