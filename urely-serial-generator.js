@@ -13,6 +13,35 @@ import { nanoid } from 'nanoid'
 import * as dotenv from 'dotenv'
 import axios from 'axios'
 import { SingleBar, Presets } from 'cli-progress'
+import yargs from 'yargs'
+import { hideBin } from 'yargs/helpers'
+
+const argv = yargs(hideBin(process.argv))
+  .option('serial', {
+    alias: 's',
+    type: 'number',
+    description: 'Set the serial number',
+    default: process.env.SERIAL
+  })
+  .option('serialLength', {
+    alias: 'l',
+    type: 'number',
+    description: 'Set the serial length',
+    default: process.env.SERIAL_LENGTH
+  })
+  .option('batchLength', {
+    alias: 'b',
+    type: 'number',
+    description: 'Set the batch length',
+    default: process.env.BATCH_LENGTH
+  })
+  .option('batchName', {
+    alias: 'n',
+    type: 'string',
+    description: 'Set the batch name',
+    default: process.env.BATCH_NAME
+  })
+  .argv
 
 // Create a new progress bar instance
 const progressBar = new SingleBar(
@@ -103,16 +132,17 @@ async function loadTags (batches, accessToken) {
   }
   progressBar.stop()
 }
+
 export async function generateAndLoad ({
   serial,
   serialLength,
   batchLength,
   batchName
 } = {}) {
-  serial = serial || process.env.SERIAL
-  serialLength = serialLength || process.env.SERIAL_LENGTH
-  batchLength = batchLength || process.env.BATCH_LENGTH
-  batchName = batchName || process.env.BATCH_NAME
+  serial = serial || argv.serial
+  serialLength = serialLength || argv.serialLength
+  batchLength = batchLength || argv.batchLength
+  batchName = batchName || argv.batchName
   const batches = await generate(serial, serialLength, batchLength, batchName)
   console.log(`Generated ${batches.length}  ${batchName} batches.`)
   console.log(
