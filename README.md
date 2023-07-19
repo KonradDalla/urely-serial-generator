@@ -24,6 +24,9 @@ SERIAL=50000
 SERIAL_LENGTH=12
 BATCH_LENGTH=10000
 BATCH_NAME="Your batch name here"
+PREFIX="Your prefix here"
+SUFFIX="Your suffix here"
+EXPORT_BATCH=true
 URELY_USERNAME="Your username here"
 URELY_PASSWORD="Your password here"
 URELY_APIKEY="Your API key here"
@@ -108,5 +111,30 @@ To use the module, follow the steps below:
    * serialLength or -l: Set the serial number length (default: SERIAL_LENGTH from .env).
    * batchLength or -b: Set the batch length to laod (default: BATCH_LENGTH from .env).
    * batchName or -n: Set the batch name (default: BATCH_NAME from .env).
+   * prefix or -p: set prefix.
+   * suffix or -x: Set the suffix.
+   * suffix or -x: Set the suffix.
+   * exportBatch or -e: export data in csv format (tha name of the file will be the batch_name).
+## Optional Prefix and Suffix
+
+You can optionally include a prefix and suffix for the generated serial numbers.
+
+To set the prefix and suffix using command-line arguments:
+
+```bash
+node index.js --prefix="Your prefix here" --suffix="Your suffix here"
+```
+
+Or using short names:
+
+```bash
+node index.js -p "Your prefix here" -x "Your suffix here"
+```
+
+## Batch Export
+
+You can enable the automatic export of each batch as a CSV file named after the batch name.
+To enable batch export, set the `EXPORT_BATCH` variable in the `.env` file to `true`:
+
 
 That's it! You can now use the module with the desired arguments, environment variables, or defaults. Feel free to customize the arguments and environment variables according to your needs.

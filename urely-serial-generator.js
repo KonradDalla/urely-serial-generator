@@ -15,6 +15,7 @@ import axios from 'axios'
 import { SingleBar, Presets } from 'cli-progress'
 import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
+import ObjectsToCsv from 'objects-to-csv'
 
 const argv = yargs(hideBin(process.argv))
   .option('serial', {
@@ -41,7 +42,24 @@ const argv = yargs(hideBin(process.argv))
     description: 'Set the batch name',
     default: process.env.BATCH_NAME
   })
-  .argv
+  .option('prefix', {
+    alias: 'p',
+    type: 'string',
+    description: 'Set the prefix',
+    default: process.env.PREFIX || ''
+  })
+  .option('suffix', {
+    alias: 'x',
+    type: 'string',
+    description: 'Set the suffix',
+    default: process.env.SUFFIX || ''
+  })
+  .option('exportBatch', {
+    alias: 'e',
+    type: 'string',
+    description: 'Set csv export',
+    default: process.env.EXPORT_BATCH || true
+  }).argv
 
 // Create a new progress bar instance
 const progressBar = new SingleBar(
@@ -57,13 +75,20 @@ const progressBar = new SingleBar(
 )
 dotenv.config()
 
-async function generate (serial, serialLength, batchLength, batchName) {
+async function generate (
+  serial,
+  serialLength,
+  batchLength,
+  batchName,
+  prefix,
+  suffix
+) {
   const batches = []
   let tags = []
   // Generate serial and add to tags array
   for (let i = 0; i < serial; i++) {
     const tag = {
-      uid: nanoid(serialLength),
+      uid: `${prefix}${nanoid(serialLength)}${suffix}`,
       tagTypeId: process.env.URELY_TAGTYPEID,
       brandId: process.env.URELY_BRANDID,
       batchName
@@ -137,13 +162,20 @@ export async function generateAndLoad ({
   serial,
   serialLength,
   batchLength,
-  batchName
+  batchName,
+  prefix,
+  suffix,
+  exportBatch
 } = {}) {
-  serial = serial || argv.serial
-  serialLength = serialLength || argv.serialLength
-  batchLength = batchLength || argv.batchLength
-  batchName = batchName || argv.batchName
-  const batches = await generate(serial, serialLength, batchLength, batchName)
+  serial = argv.serial || serial || process.env.SERIAL
+  serialLength = argv.serialLength || serialLength || process.env.SERIAL_LENGTH
+  batchLength = argv.batchLength || batchLength || process.env.BATCH_LENGTH
+  batchName = argv.batchName || batchName || process.env.BATCH_NAME
+  prefix = argv.prefix || prefix || process.env.PREFIX || ''
+  suffix = argv.suffix || suffix || process.env.SUFFIX || ''
+  exportBatch = argv.exportBatch || exportBatch || process.env.EXPORT_BATCH
+  const batches = await generate(serial, serialLength, batchLength, batchName, prefix,
+    suffix, exportBatch)
   console.log(`Generated ${batches.length}  ${batchName} batches.`)
   console.log(
     `Total serial generated: ${serial}  with ${serialLength} length.`
@@ -153,5 +185,25 @@ export async function generateAndLoad ({
   // Start the progress bar
   progressBar.start(batches.length, 0)
   await loadTags(batches, accessToken)
+  if (exportBatch || exportBatch === 'true') {
+    await exportBatches(batches, batchName)
+  }
   console.log('Done!')
+}
+
+async function exportBatches (batches, batchName) {
+  const csvFilePath = `${batchName}.csv`
+  await saveCSV(csvFilePath, batches)
+}
+
+async function saveCSV (filePath, data) {
+  try {
+    for (let i = 0; i < data.length; i++) {
+      const csv = new ObjectsToCsv(data[i])
+      await csv.toDisk(filePath, { append: true })
+    }
+    console.log(`Batch exported to: ${filePath}`)
+  } catch (error) {
+    console.error(`Error saving CSV file: ${error}`)
+  }
 }
