@@ -54,6 +54,12 @@ const argv = yargs(hideBin(process.argv))
     description: 'Set the suffix',
     default: process.env.SUFFIX || ''
   })
+  .option('additionalParameters', {
+    alias: 'a',
+    type: 'string',
+    description: 'Set additional parameters as a JSON string',
+    default: process.env.ADDITIONAL_PARAMETERS || undefined
+  })
   .option('exportBatch', {
     alias: 'e',
     type: 'string',
@@ -81,7 +87,9 @@ async function generate (
   batchLength,
   batchName,
   prefix,
-  suffix
+  suffix,
+  exportBatch,
+  additionalParameters
 ) {
   const batches = []
   let tags = []
@@ -91,7 +99,8 @@ async function generate (
       uid: `${prefix}${nanoid(serialLength)}${suffix}`,
       tagTypeId: process.env.URELY_TAGTYPEID,
       brandId: process.env.URELY_BRANDID,
-      batchName
+      batchName,
+      additionalParameters
     }
     tags.push(tag)
     // if > then BATCH_LENGTH add to batches array and reset the tags array
@@ -165,7 +174,8 @@ export async function generateAndLoad ({
   batchName,
   prefix,
   suffix,
-  exportBatch
+  exportBatch,
+  additionalParameters
 } = {}) {
   serial = argv.serial || serial || process.env.SERIAL
   serialLength = argv.serialLength || serialLength || process.env.SERIAL_LENGTH
@@ -173,9 +183,10 @@ export async function generateAndLoad ({
   batchName = argv.batchName || batchName || process.env.BATCH_NAME
   prefix = argv.prefix || prefix || process.env.PREFIX || ''
   suffix = argv.suffix || suffix || process.env.SUFFIX || ''
-  exportBatch = argv.exportBatch || exportBatch || process.env.EXPORT_BATCH
+  exportBatch = argv.exportBatch || exportBatch || process.env.EXPORT_BATCH || false
+  additionalParameters = JSON.parse(argv.additionalParameters || additionalParameters || process.env.ADDITIONAL_PARAMETERS || '{}')
   const batches = await generate(serial, serialLength, batchLength, batchName, prefix,
-    suffix, exportBatch)
+    suffix, exportBatch, additionalParameters)
   console.log(`Generated ${batches.length}  ${batchName} batches.`)
   console.log(
     `Total serial generated: ${serial}  with ${serialLength} length.`

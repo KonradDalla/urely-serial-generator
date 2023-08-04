@@ -47,7 +47,7 @@ To use the module, follow the steps below:
 
 2. Set up the environment variables. Create a `.env` file in the root directory of your project and provide the necessary values. Here's an example `.env` file:
 
-   ```
+   ```dotenv
    SERIAL=ABC123
    SERIAL_LENGTH=8
    BATCH_LENGTH=50
@@ -59,7 +59,7 @@ To use the module, follow the steps below:
 3. Import the `generateAndLoad` function from the module in your index file:
 
    ```javascript
-   import { generateAndLoad } from './urely-serial-generator.js'
+   import { generateAndLoad } from "./urely-serial-generator.js";
    ```
 
 4. Call the `generateAndLoad` function, passing the desired arguments. The function will prioritize the provided arguments, fallback to environment variables if available, and finally use default values:
@@ -67,10 +67,10 @@ To use the module, follow the steps below:
    ```javascript
    // Example 1: Providing all arguments from the index file
    generateAndLoad({
-     serial: 'ABC123',
+     serial: "ABC123",
      serialLength: 8,
      batchLength: 50,
-     batchName: 'My Batch'
+     batchName: "My Batch",
    });
 
    // Example 2: Using environment variables
@@ -78,7 +78,7 @@ To use the module, follow the steps below:
 
    // Example 3: Using a mix of arguments and environment variables
    generateAndLoad({
-     serial: 'XYZ789',
+     serial: "XYZ789",
      serialLength: process.env.SERIAL_LENGTH,
      batchLength: 100,
    });
@@ -96,38 +96,40 @@ To use the module, follow the steps below:
 
 6. You can also pass command-line arguments to override the default values from the environment variables:
 
-   ```shell
+```shell
    node index.js --serial=100 --batchName=test3
-   ```
+```
 
-   Or using short names:
+Or using short names:
 
-   ```shell
+```shell
    node index.js -s 100 -n test3
-   ```
-   The available options are:
+```
 
-   * serial or -s: Set how many serial numbers will be generated (default: SERIAL from .env).
-   * serialLength or -l: Set the serial number length (default: SERIAL_LENGTH from .env).
-   * batchLength or -b: Set the batch length to laod (default: BATCH_LENGTH from .env).
-   * batchName or -n: Set the batch name (default: BATCH_NAME from .env).
-   * prefix or -p: set prefix.
-   * suffix or -x: Set the suffix.
-   * suffix or -x: Set the suffix.
-   * exportBatch or -e: export data in csv format (tha name of the file will be the batch_name).
+The available options are:
+
+- serial or -s: Set how many serial numbers will be generated (default: SERIAL from .env).
+- serialLength or -l: Set the serial number length (default: SERIAL_LENGTH from .env).
+- batchLength or -b: Set the batch length to laod (default: BATCH_LENGTH from .env).
+- batchName or -n: Set the batch name (default: BATCH_NAME from .env).
+- prefix or -p: set prefix.
+- suffix or -x: Set the suffix.
+- suffix or -x: Set the suffix.
+- exportBatch or -e: export data in csv format (tha name of the file will be the batch_name).
+
 ## Optional Prefix and Suffix
 
 You can optionally include a prefix and suffix for the generated serial numbers.
 
 To set the prefix and suffix using command-line arguments:
 
-```bash
+```shell
 node index.js --prefix="Your prefix here" --suffix="Your suffix here"
 ```
 
 Or using short names:
 
-```bash
+```shell
 node index.js -p "Your prefix here" -x "Your suffix here"
 ```
 
@@ -136,5 +138,29 @@ node index.js -p "Your prefix here" -x "Your suffix here"
 You can enable the automatic export of each batch as a CSV file named after the batch name.
 To enable batch export, set the `EXPORT_BATCH` variable in the `.env` file to `true`:
 
+## Additional Parameters
+
+You can insert a fixed JSON string as additional parameters during the loading process. The JSON string will be used as `additionalParameters` for all the generated serial numbers.
+
+To set the additional parameters using command-line arguments, pass the JSON string as a single-quoted argument:
+
+```shell
+node index.js --additionalParameters='{"productCategory":"eyewear","anotherParameter":5}'
+```
+
+Or using short names:
+
+```shell
+node index.js -a '{"productCategory":"eyewear","anotherParameter":5}'
+```
+
+The additional parameters can also be set in the .env file by adding the following line:
+
+```dotenv
+ADDITIONAL_PARAMETERS={"productCategory":"eyewear","anotherParameter":5}
+```
+
+If no additional parameters are provided, an empty object will be used as the default.
+The JSON string should be in a valid JSON format.
 
 That's it! You can now use the module with the desired arguments, environment variables, or defaults. Feel free to customize the arguments and environment variables according to your needs.
