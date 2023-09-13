@@ -133,6 +133,7 @@ async function login () {
 }
 
 async function loadTags (batches, accessToken) {
+  let continueProcessing = true // Initialize a flag to continue processing
   for (let i = 0; i < batches.length; i++) {
     try {
       const tags = batches[i]
@@ -162,11 +163,22 @@ async function loadTags (batches, accessToken) {
     } catch (error) {
       console.error(error)
       progressBar.stop()
+      continueProcessing = false // Initialize a flag to continue processing
+    }
+    if (!continueProcessing) {
+      console.log('Error occurred. Stopping further processing.')
+      return continueProcessing// Exit the function early, preventing CSV generation
     }
   }
   progressBar.stop()
+  return continueProcessing
 }
-
+function getAdditionalParameters (additionalParameters) {
+  if (argv.additionalParameters) return JSON.parse(argv.additionalParameters)
+  if (additionalParameters) return additionalParameters
+  if (process.env.ADDITIONAL_PARAMETERS) return JSON.parse(process.env.ADDITIONAL_PARAMETERS)
+  else return {}
+}
 export async function generateAndLoad ({
   serial,
   serialLength,
@@ -177,14 +189,14 @@ export async function generateAndLoad ({
   exportBatch,
   additionalParameters
 } = {}) {
-  serial = argv.serial || serial || process.env.SERIAL
-  serialLength = argv.serialLength || serialLength || process.env.SERIAL_LENGTH
-  batchLength = argv.batchLength || batchLength || process.env.BATCH_LENGTH
-  batchName = argv.batchName || batchName || process.env.BATCH_NAME
+  serial = argv.serial || serial || process.env.SERIAL || 1
+  serialLength = argv.serialLength || serialLength || process.env.SERIAL_LENGTH || 12
+  batchLength = argv.batchLength || batchLength || process.env.BATCH_LENGTH || 1000
+  batchName = argv.batchName || batchName || process.env.BATCH_NAME || (new Date()).toISOString()
   prefix = argv.prefix || prefix || process.env.PREFIX || ''
   suffix = argv.suffix || suffix || process.env.SUFFIX || ''
   exportBatch = argv.exportBatch || exportBatch || process.env.EXPORT_BATCH || false
-  additionalParameters = JSON.parse(argv.additionalParameters || additionalParameters || process.env.ADDITIONAL_PARAMETERS || '{}')
+  additionalParameters = getAdditionalParameters(additionalParameters)
   const batches = await generate(serial, serialLength, batchLength, batchName, prefix,
     suffix, exportBatch, additionalParameters)
   console.log(`Generated ${batches.length}  ${batchName} batches.`)
@@ -195,15 +207,19 @@ export async function generateAndLoad ({
   console.log('Login OK!')
   // Start the progress bar
   progressBar.start(batches.length, 0)
-  await loadTags(batches, accessToken)
+  const continueProcessing = await loadTags(batches, accessToken)
+  if (!continueProcessing) {
+    return // Exit the function early, preventing CSV generation
+  }
+
   if (exportBatch || exportBatch === 'true') {
-    await exportBatches(batches, batchName)
+    await exportBatches(batches, batchName, serial)
   }
   console.log('Done!')
 }
 
-async function exportBatches (batches, batchName) {
-  const csvFilePath = `${batchName}.csv`
+async function exportBatches (batches, batchName, serial) {
+  const csvFilePath = `${serial}_${batchName}.csv`
   await saveCSV(csvFilePath, batches)
 }
 

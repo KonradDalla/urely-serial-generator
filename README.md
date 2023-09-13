@@ -54,7 +54,9 @@ To use the module, follow the steps below:
    BATCH_NAME=My Batch
    ```
 
-   Make sure to replace the values with your desired configuration.
+   *Make sure to replace the values with your desired configuration.*
+
+   **Priority of configuration properties are: command line, js library, .env file, default values.**
 
 3. Import the `generateAndLoad` function from the module in your index file:
 
